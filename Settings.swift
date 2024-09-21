@@ -1,18 +1,17 @@
 //
 //  Settings.swift
-//  Canon Hero
+//  Take Them Down
 //
-//  Created by KHALID on 17/09/15.
-//  Copyright (c) 2015 KHALID. All rights reserved.
+//  Created by Pisi on 11/13/15.
+//  Copyright © 2015 AznSoft. All rights reserved.
 //
-
 
 import Foundation
 import GameKit
 
 
-var LEADERBOARD_ID = "leader.id"
-var ITUNES_LINK = "https://itunes.apple.com/fr/app/springy-bird/id1037455806"
+var LEADERBOARD_ID = "take_score"
+var ITUNES_LINK = "https://itunes.apple.com/us/app/take-them-down/id1059083737"
 var SHARE_TEXT = "Just Got \(GameScene.currentScore), Download now : \(ITUNES_LINK)"
 
 
@@ -185,7 +184,12 @@ func getDefaultCharacter() -> String
     }
 }
 
-func unlockCaracter(id: String)
+func getRandomEnemy() -> String
+{
+    return String(arc4random_uniform(3) + 1)
+}
+
+func unlockCharacter(id: String)
 {
     NSUserDefaults.standardUserDefaults().setObject(true, forKey:id)
     NSUserDefaults.standardUserDefaults().synchronize()

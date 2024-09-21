@@ -1,11 +1,10 @@
 //
 //  Cloud.swift
-//  Canon Hero
+//  Take Them Down
 //
-//  Created by KHALID on 15/09/15.
-//  Copyright (c) 2015 KHALID. All rights reserved.
+//  Created by Pisi on 11/13/15.
+//  Copyright © 2015 AznSoft. All rights reserved.
 //
-
 import Foundation
 import SpriteKit
 

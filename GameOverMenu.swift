@@ -1,9 +1,9 @@
 //
 //  GameOverMenu.swift
-//  Canon Hero
+//  Take Them Down
 //
-//  Created by KHALID on 17/09/15.
-//  Copyright (c) 2015 KHALID. All rights reserved.
+//  Created by Pisi on 11/13/15.
+//  Copyright © 2015 AznSoft. All rights reserved.
 //
 
 import Foundation
@@ -17,7 +17,6 @@ class GameOverMenu
     var replay : SKSpriteNode
     var share : SKSpriteNode
     var rate : SKSpriteNode
-    
     var scoreHoler : SKSpriteNode
     var score : SKLabelNode
     var best : SKLabelNode
@@ -25,7 +24,7 @@ class GameOverMenu
     var gameover : SKSpriteNode
     
     var revive : SKSpriteNode!
-    
+//    var removeAdsBtn: SKSpriteNode!
     var parent : SKScene
     
     init(parent: SKScene, ScoreHolderNamed : String)
@@ -39,6 +38,7 @@ class GameOverMenu
         replay = SKSpriteNode(imageNamed: "Replay")
         share = SKSpriteNode(imageNamed: "Share")
         rate = SKSpriteNode(imageNamed: "Rate")
+        revive = SKSpriteNode(imageNamed: "Revive")
         
         scoreHoler = SKSpriteNode(imageNamed: ScoreHolderNamed)
         ScaleWithWidth(scoreHoler, width: ScreenSize.width)
@@ -76,6 +76,7 @@ class GameOverMenu
         Scale(replay, Height: btnScale*1.5)
         Scale(share, Height: btnScale)
         Scale(rate, Height: btnScale)
+        ScaleWithWidth(revive, width: ScreenSize.width*0.35)
         
         let Ypos = ScreenSize.height*1.12
         
@@ -87,8 +88,10 @@ class GameOverMenu
         shop.position = CGPoint(x: replay.position.x - shop.size.width*1.3 , y: Ypos)
         home.position = CGPoint(x: shop.position.x - home.size.width*1.3, y: Ypos)
         
-        AddElementToScene([shop,rate,home,replay,share,scoreHoler,gameover], to: parent)
-        RunActionOn([shop,rate,home,replay,share,scoreHoler,gameover], action: SKAction.moveBy(CGVector(dx: 0, dy: -ScreenSize.height), duration: 0.3))
+        revive.position = CGPoint(x: ScreenSize.width/2, y: ScreenSize.height*1.5 - revive.size.height/2)
+        revive.zPosition = BackgroundManager.Layer3 + 100
+        AddElementToScene([shop,rate,home,replay,share,scoreHoler,gameover, revive], to: parent)
+        RunActionOn([shop,rate,home,replay,share,scoreHoler,gameover, revive], action: SKAction.moveBy(CGVector(dx: 0, dy: -ScreenSize.height), duration: 0.3))
         
     }
     
@@ -102,6 +105,15 @@ class GameOverMenu
         parent.addChild(revive)
     }
     
+/*    func SetRemoveAdsBtn()
+    {
+        removeAdsBtn = SKSpriteNode(imageNamed: "RemoveAds")
+        ScaleWithWidth(removeAdsBtn, width: ScreenSize.width*0.35)
+        removeAdsBtn.position = CGPoint(x: ScreenSize.width/2, y: ScreenSize.height/3 - removeAdsBtn.size.height/2)
+        removeAdsBtn.zPosition = BackgroundManager.Layer3 + 100
+        parent.addChild(removeAdsBtn)
+    }
+  */  
     func hide()
     {
         let action = SKAction.moveBy(CGVector(dx: 0, dy: ScreenSize.height), duration: 0)

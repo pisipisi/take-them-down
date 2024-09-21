@@ -1,9 +1,9 @@
 //
 //  BackgroundManager.swift
-//  Canon Hero
+//  Take Them Down
 //
-//  Created by KHALID on 13/09/15.
-//  Copyright (c) 2015 KHALID. All rights reserved.
+//  Created by Pisi on 11/13/15.
+//  Copyright © 2015 AznSoft. All rights reserved.
 //
 
 import SpriteKit
@@ -35,7 +35,7 @@ class BackgroundManager
         
         for i in 0...2
         {
-            let l1 = SKSpriteNode(imageNamed: "BgLayer1")
+            let l1 = SKSpriteNode(imageNamed: "bg1")
             ScaleWithWidth(l1, width: ScreenSize.width)
             l1.position = CGPoint(x: CGFloat(i)*ScreenSize.width, y: Hero.HeroPositionOnScreen.y)
             l1.zPosition = BackgroundManager.Layer1
@@ -44,7 +44,7 @@ class BackgroundManager
             Layer1Array.append(l1)
             
             parent.addChild(l1)
-            
+            /*
             let l2 = SKSpriteNode(imageNamed: "BgLayer2")
             ScaleWithWidth(l2, width: ScreenSize.width)
             l2.position = CGPoint(x: CGFloat(i)*ScreenSize.width, y: Hero.HeroPositionOnScreen.y)
@@ -53,7 +53,7 @@ class BackgroundManager
             l2.anchorPoint = ZERO_ANCHOR
             Layer2Array.append(l2)
             
-            parent.addChild(l2)
+            parent.addChild(l2)*/
         }
     }
     
@@ -68,7 +68,7 @@ class BackgroundManager
     
     func move()
     {
-        let wait = SKAction.waitForDuration(TowerManager.LevelStepDelay)
+        let wait = SKAction.waitForDuration(RockManager.LevelStepDelay)
         let Layer1move = SKAction.moveByX(-ScreenSize.width/6, y: 0, duration: 0.5)
         let Layer2move = SKAction.moveByX(-ScreenSize.width/4, y: 0, duration: 0.5)
         

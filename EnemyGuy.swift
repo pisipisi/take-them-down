@@ -1,9 +1,9 @@
 //
 //  EnimieGuy.swift
-//  Canon Hero
+//  Take Them Down
 //
-//  Created by KHALID on 14/09/15.
-//  Copyright (c) 2015 KHALID. All rights reserved.
+//  Created by Pisi on 11/13/15.
+//  Copyright © 2015 AznSoft. All rights reserved.
 //
 
 import Foundation
@@ -21,7 +21,7 @@ class EnemyGuy
     init()
     {
         holder = SKSpriteNode(color: UIColor.clearColor(), size: CGSize(width: 0, height: Hero.HeroHeight*1.2))
-        body = SKSpriteNode(imageNamed: "Enemy")
+        body = SKSpriteNode(imageNamed: "Enemy1[Body]")
         arm = SKSpriteNode(imageNamed: "Enemy[Arm]")
         
 //        setAnchors([body], ZERO_ANCHOR)
@@ -56,12 +56,42 @@ class EnemyGuy
         holder.runAction(SKAction.playSoundFileNamed("CoinSound.mp3", waitForCompletion: false))
     }
     
-    func AddToTower(parent: SKScene, position : CGPoint)
+    func genShield()
+    {
+        let shield = SKSpriteNode(imageNamed: "ShieldBonus")
+        ScaleWithWidth(shield, width: holder.size.width*2)
+        shield.position = CGPoint(x: holder.position.x + holder.size.width/2, y: holder.position.y + holder.size.height/2)
+        self.parent.addChild(shield)
+        
+        let move = SKAction.moveBy(CGVector(dx: 0, dy: holder.size.height*4), duration: 0.7)
+        let hide = SKAction.fadeAlphaTo(0, duration: 0.7)
+        let action = SKAction.group([move,hide])
+        shield.runAction(action, completion: {
+            shield.removeFromParent()
+        })
+        if !SoundState{return}
+        holder.runAction(SKAction.playSoundFileNamed("CoinSound.mp3", waitForCompletion: false))
+    }
+    
+    func AddToRock(parent: SKScene, position : CGPoint)
     {
         self.parent = parent
         holder.position = position
         holder.zPosition = parent.zPosition + 1
         parent.addChild(holder)
+    }
+    
+    func fly()
+    {
+        forEverAnimation(self.body, sheet: "Enemy\(arc4random_uniform(12)+1)[Fly]", nx: 8, ny: 1, count: 8)
+    }
+    
+    func stop()
+    {
+
+        body.removeAllActions()
+        forEverAnimation(body, sheet: "Enemy1[Body]", nx: 1, ny: 1, count: 1)
+
     }
     
     func particles()
@@ -93,8 +123,10 @@ class EnemyGuy
     
     func die()
     {
-        body.runAction(SKAction.colorizeWithColor(UIColor.blackColor(), colorBlendFactor: 1, duration: 0.0))
-        let up = SKAction.moveTo(CGPoint(x: holder.position.x + holder.size.width*(random(1, end: 10)/10), y: holder.position.y + holder.size.height), duration: 0.1)
+        stop()
+        animation(self.body, sheet: "Enemy[BlowUp]", nx: 8, ny: 1, count: 8)
+        body.runAction(SKAction.colorizeWithColor(UIColor.blackColor(), colorBlendFactor: 1, duration: 0.2))
+        let up = SKAction.moveTo(CGPoint(x: holder.position.x + holder.size.width*(random(1, end: 10)/10), y: holder.position.y + holder.size.height), duration: 0.2)
         let down = SKAction.moveTo(CGPoint(x: holder.position.x - holder.size.width/2, y: -holder.size.height*2), duration: 1)
         let hide = SKAction.fadeAlphaTo(0, duration: 0.2)
         let s1 = SKAction.sequence([up,down])
@@ -185,7 +217,7 @@ class EnemyGuy
         let left = SKAction.moveByX(arm.size.width/10, y: 0, duration: 0.02)
         let shack = SKAction.sequence([right,left])
         if !SoundState {return}
-        arm.runAction(SKAction.group([shack,SKAction.playSoundFileNamed("shoot.mp3", waitForCompletion: false)]))
+        arm.runAction(SKAction.group([shack,SKAction.playSoundFileNamed("Hero1[shoot].mp3", waitForCompletion: false)]))
     }
     
     func reloadSound()
@@ -211,8 +243,8 @@ class EnemyGuy
         if(bullet.position.x - bullet.size.width/2 < ScreenSize.width && bullet.position.y - bullet.size.height/2 < ScreenSize.height)
         {
             bulletParticles()
-            bullet.position.x += -cos(bullet.zRotation)*ScreenSize.width/30
-            bullet.position.y += -sin(bullet.zRotation)*ScreenSize.width/30
+            bullet.position.x += -cos(bullet.zRotation)*ScreenSize.width/10
+            bullet.position.y += -sin(bullet.zRotation)*ScreenSize.width/10
         }
     }
 }

@@ -1,4 +1,8 @@
-
+//  Take Them Down
+//
+//  Created by Pisi on 11/13/15.
+//  Copyright © 2015 AznSoft. All rights reserved.
+//
 
 
 
@@ -30,7 +34,7 @@ func playbg(music: String)
 {
     let bgMusicUrl = NSBundle.mainBundle().URLForResource(music, withExtension: "mp3")
     bgMusicPlayer = try? AVAudioPlayer(contentsOfURL: bgMusicUrl!)
-    bgMusicPlayer.volume = 1
+    bgMusicPlayer.volume = 0.4
     bgMusicPlayer.numberOfLoops = -1
     bgMusicPlayer.prepareToPlay()
     bgMusicPlayer.play()

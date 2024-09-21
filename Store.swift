@@ -1,19 +1,10 @@
 //
 //  Store.swift
-//  Canon Hero
+//  Take Them Down
 //
-//  Created by KHALID on 17/09/15.
-//  Copyright (c) 2015 KHALID. All rights reserved.
+//  Created by Pisi on 11/13/15.
+//  Copyright © 2015 AznSoft. All rights reserved.
 //
-
-//
-//  Store.swift
-//  Super spring jumper
-//
-//  Created by KHALID on 17/09/15.
-//  Copyright (c) 2015 KHALID. All rights reserved.
-//
-
 
 
 
@@ -22,15 +13,21 @@ import SpriteKit
 
 class Store : SKScene
 {
-    var CHARACTER_PRICE = 10
-    var Characters = ["Hero3","Hero2","Hero1"]
+    //var CHARACTER_PRICE = 100
+    var Character_Price = [0,100,500,1000]
+    var Characters = ["Hero1","Hero2","Hero3","Hero4"]
     var buttons = [SKSpriteNode]()
-    
+    var locks = [SKSpriteNode]()
     var holder : SKSpriteNode!
     var header : SKSpriteNode!
     var backBtn : SKSpriteNode!
-    
+    var selectBtn : SKSpriteNode!
     var scoreBoard : ScoreManager!
+    var selectHero : Int = 0
+    var char : SKSpriteNode!
+    var head : SKSpriteNode = SKSpriteNode(imageNamed: "Hero1[Head]")
+    var legs : SKSpriteNode = SKSpriteNode(imageNamed: "Hero1[Legs]")
+    var arm : SKSpriteNode = SKSpriteNode(imageNamed: "Hero1[Arm]")
     
     var check : SKSpriteNode!
     
@@ -51,6 +48,11 @@ class Store : SKScene
         bg.anchorPoint = ZERO_ANCHOR
         self.addChild(bg)
         
+        let bottom = SKSpriteNode(imageNamed: "bottom_bg")
+        bottom.size = CGSize(width: ScreenSize.width, height: ScreenSize.height*0.7)
+        bottom.anchorPoint = ZERO_ANCHOR
+        self.addChild(bottom)
+        
         holder = SKSpriteNode(color: UIColor.clearColor(), size: CGSize(width: ScreenSize.width, height: ScreenSize.height*0.8))
         holder.anchorPoint = ZERO_ANCHOR
         
@@ -64,13 +66,36 @@ class Store : SKScene
         Scale(backBtn, Height: ScreenSize.height*0.1)
         backBtn.anchorPoint = ZERO_ANCHOR
         backBtn.position = CGPoint(x: backBtn.size.width * 0.2, y: ScreenSize.height - backBtn.size.height)
-        
         self.addChild(backBtn)
         self.addChild(header)
         
+        for i in 0...1
+        {
+            let l1 = SKSpriteNode(imageNamed: "bg1")
+            ScaleWithWidth(l1, width: ScreenSize.width)
+            l1.position = CGPoint(x: CGFloat(i)*ScreenSize.width, y: ScreenSize.height*0.7)
+            l1.zPosition = bg.zPosition + 1
+            l1.anchorPoint = ZERO_ANCHOR
+            self.addChild(l1)
+        
+            let platfrm = SKSpriteNode(imageNamed: "Platform")
+            ScaleWithWidth(platfrm, width: ScreenSize.width)
+            platfrm.position = CGPoint(x: CGFloat(i)*ScreenSize.width, y: ScreenSize.height*0.7 - platfrm.size.height)
+            platfrm.zPosition = l1.zPosition
+            platfrm.anchorPoint = ZERO_ANCHOR
+            self.addChild(platfrm)
+        }
+
+        selectBtn = SKSpriteNode(imageNamed: "select_btn")
+        ScaleWithWidth(selectBtn, width: ScreenSize.width/2)
+        selectBtn.position = CGPoint(x: ScreenSize.width/2 - selectBtn.size.width/2, y: ScreenSize.height*0.1)
+        selectBtn.zPosition = bg.zPosition + 2
+        selectBtn.anchorPoint = ZERO_ANCHOR
+        self.addChild(selectBtn)
+        
         initCheckBtn()
         setUpButtons()
-        
+        initHero(getDefaultCharacter())
         scoreBoard = ScoreManager(parent: self)
         scoreBoard.CHolder.zPosition = BackgroundManager.Layer3 + 100
         scoreBoard.Coins.zPosition = BackgroundManager.Layer3 + 100
@@ -81,7 +106,30 @@ class Store : SKScene
         
         let touch = touches.first! as UITouch
         let touchpos = touch.locationInNode(self)
-        
+        if(nodeAtPoint(touchpos) == selectBtn) {
+            animateNode(selectBtn)
+            if(CheckCharacter(Characters[selectHero]))
+            {
+                setDefaultCharacter(Characters[selectHero])
+                Back()
+                return
+            } else {
+                if(getCoins() >= Character_Price[selectHero])
+                {
+                    unlockCharacter(Characters[selectHero])
+                    setDefaultCharacter(Characters[selectHero])
+                    let coins = getCoins() - Character_Price[selectHero]
+                    saveCoins(coins)
+                    check(buttons[selectHero])
+                    showSelectBtn()
+                    buttons[selectHero].alpha = 1
+                    locks[selectHero].alpha = 0
+                } else {
+                    scoreBoard.ShackCoins()
+                }
+                return
+            }
+        }
         
         if(nodeAtPoint(touchpos) == backBtn)
         {
@@ -94,30 +142,24 @@ class Store : SKScene
             {
                 if(nodeAtPoint(touchpos) == buttons[i])
                 {
+                    selectHero = i
                     animateNode(buttons[i])
+                    check(buttons[i])
                     if(CheckCharacter(Characters[i]))
                     {
-                        check(buttons[i])
-                        setDefaultCharacter(Characters[i])
+                        check.alpha = 1
+                        changeHero(Characters[i])
+                        showSelectBtn()
                         return
                     }
                     else
                     {
-                        if(getCoins() >= CHARACTER_PRICE)
-                        {
-                            unlockCaracter(Characters[i])
-                            setDefaultCharacter(Characters[i])
-                            let coins = getCoins() - CHARACTER_PRICE
-                            saveCoins(coins)
-                            check(buttons[i])
-                            Back()
-                        }
-                        else
-                        {
-                            scoreBoard.ShackCoins()
-                        }
+                        check.alpha = 0
+                        showPriceBtn(Characters[i])
+                        changeHero(Characters[i])
                         return
                     }
+
                 }
             }
         }
@@ -125,29 +167,55 @@ class Store : SKScene
     
     func setUpButtons()
     {
-        let btnSize = CGSize(width: holder.size.width*0.95, height: holder.size.height/CGFloat(Characters.count))
+      //  let btnSize = CGSize(width: holder.size.width/4.1, height: holder.size.height/CGFloat(Characters.count))
         
+        var column:Int = 0
+        var row:Int = 2
         for i in 0...Characters.count-1
         {
+            let btn = SKSpriteNode(imageNamed: Characters[i])
+            ScaleWithWidth(btn, width: holder.size.width/CGFloat(4))
+            btn.anchorPoint = ZERO_ANCHOR
+            btn.position = pointForColumn(column, row: row)
             
-            var imageNamed = "Locked"
-            
+            let lock = SKSpriteNode(imageNamed: "locked_check")
+            ScaleWithWidth(lock, width: btn.size.width/5)
+            lock.anchorPoint = ZERO_ANCHOR
+            lock.position = CGPoint(x: btn.position.x + btn.size.width*0.8, y: btn.position.y)
+            lock.zPosition = btn.zPosition + 1
+
             if(CheckCharacter(Characters[i]))
             {
-                imageNamed = Characters[i]
+                btn.alpha = 1
+                lock.alpha = 0
+               
+            } else {
+            //    let black = SKAction.colorizeWithColor(UIColor.grayColor(), colorBlendFactor: 0.5, duration: 0.0)
+            //    btn.runAction(black)
+                btn.alpha = 0.5
+                lock.alpha = 1
             }
             
-            let btn = SKSpriteNode(imageNamed: imageNamed)
-            btn.size = btnSize
-            btn.anchorPoint = ZERO_ANCHOR
-            btn.position = CGPoint(x: ScreenSize.width/2 - btn.size.width/2, y: btn.size.height * CGFloat(i))
-            
+            if column == 3 {
+                column = 0
+                row++
+            } else {
+                column++
+            }
             buttons.append(btn)
+            locks.append(lock)
             holder.addChild(btn)
+            holder.addChild(lock)
         }
         self.addChild(holder)
     }
     
+    func pointForColumn(column: Int, row: Int) -> CGPoint {
+        let eachSpot = ScreenSize.width/CGFloat(4)
+        return CGPoint(
+            x: CGFloat(column)*eachSpot ,
+            y: CGFloat(row)*eachSpot )
+    }
     
     func initCheckBtn()
     {
@@ -164,6 +232,44 @@ class Store : SKScene
         check.zPosition = target.zPosition + 10.0
     }
     
+    func initHero(choseHero: String)
+    {
+    //    let bullet = SKSpriteNode(imageNamed: "\(choseHero)[Bullet]")
+        let char = SKSpriteNode(color: UIColor.clearColor(), size: CGSize(width: 0, height: ScreenSize.height*0.3))
+
+        
+        setAnchors([char,legs], anchor: ZERO_ANCHOR)
+        arm.anchorPoint = CGPoint(x: 0.3, y: 0.5)
+        Scale(head, Height: ScreenSize.height*0.12)
+        ScaleWithWidth(legs, width: head.size.width*0.6)
+        Scale(arm, Height: ScreenSize.height*0.07)
+        
+        head.position = CGPoint(x: legs.size.width/2, y: legs.size.height + head.size.height*0.4)
+        arm.position = CGPoint(x: head.size.width*0.3, y: head.position.y - head.size.height/2 + arm.size.height/2)
+        
+        char.addChild(arm)
+        char.addChild(legs)
+        char.addChild(head)
+        char.position = CGPoint(x: ScreenSize.width/3, y: ScreenSize.height*0.7)
+        char.zPosition = BackgroundManager.Layer3 + 2
+        
+        self.addChild(char)
+    }
+    
+    func changeHero(choseHero:String)
+    {
+        head.texture = SKTexture(imageNamed: "\(choseHero)[Head]")
+        legs.texture = SKTexture(imageNamed: "\(choseHero)[Legs]")
+        arm.texture = SKTexture(imageNamed: "\(choseHero)[Arm]")
+    }
+    
+    func showPriceBtn(selectedHero:String) {
+        selectBtn.texture = SKTexture(imageNamed: "\(selectedHero)[Price_btn]")
+    }
+    
+    func showSelectBtn() {
+        selectBtn.texture = SKTexture(imageNamed: "select_btn")
+    }
     
     func Back()
     {

@@ -1,9 +1,9 @@
 //
 //  ScoreManager.swift
-//  Canon Hero
+//  Take Them Down
 //
-//  Created by KHALID on 15/09/15.
-//  Copyright (c) 2015 KHALID. All rights reserved.
+//  Created by Pisi on 11/13/15.
+//  Copyright © 2015 AznSoft. All rights reserved.
 //
 
 import Foundation
@@ -16,9 +16,12 @@ class ScoreManager
     var Score: SKLabelNode!
     var CoinsHolder: SKSpriteNode!
     var Coins: SKLabelNode!
+    var ShieldsHolder: SKSpriteNode!
+    var Shields : SKLabelNode!
     
     var SHolder : SKSpriteNode!
     var CHolder : SKSpriteNode!
+    var SSHolder : SKSpriteNode!
     
     var parent : SKScene
     
@@ -26,9 +29,6 @@ class ScoreManager
     {
         self.parent = parent
         ScoreHolder =  SKSpriteNode(color: UIColor.clearColor(), size: CGSize(width: ScreenSize.width, height: ScreenSize.height/20))
-        //        var bg = SKSpriteNode(color: UIColor.blackColor(), size: ScoreHolder.size)
-        //        bg.runAction(SKAction.fadeAlphaTo(0.3, duration: 0.0))
-        //        ScoreHolder.addChild(bg)
         ScoreHolder.position = CGPoint(x: ScreenSize.width/2, y: ScreenSize.height-(ScoreHolder.size.height/2))
         setHolders()
         
@@ -36,12 +36,22 @@ class ScoreManager
         Score.fontSize = SHolder.size.height/4
         initLabel(Score, text: "0",TextColor: UIColor.whiteColor(), parent: SHolder)
         
+        
         Coins = SKLabelNode()
         Coins.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Right
         Coins.verticalAlignmentMode = SKLabelVerticalAlignmentMode.Center
         Coins.fontSize = Score.fontSize
         Coins.position = CGPoint(x: (ScreenSize.width/2)*3/4, y: 0.0)
         initLabel(Coins, text: "\(GameScene.CurrentCoins)",TextColor: UIColor.whiteColor(), parent: ScoreHolder)
+        
+        
+        Shields = SKLabelNode()
+        Shields.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.Right
+        Shields.verticalAlignmentMode = SKLabelVerticalAlignmentMode.Center
+        Shields.fontSize = Score.fontSize
+        Shields.position = CGPoint(x: (ScreenSize.width/4)*3/4, y: 0.0)
+        initLabel(Shields, text: "\(GameScene.currentShield)",TextColor: UIColor.whiteColor(), parent: ScoreHolder)
+        
         
         ScoreHolder.zPosition = BackgroundManager.Layer1 + 2
         self.parent.addChild(ScoreHolder)
@@ -56,6 +66,11 @@ class ScoreManager
     {
         Coins.text = "\(coins)"
         saveCoins(coins)
+    }
+    
+    func UpdateShields(shields: Int)
+    {
+        Shields.text = "\(shields)"
     }
     
     func hideScore()
@@ -86,6 +101,13 @@ class ScoreManager
         Scale(SHolder, Height: ScoreHolder.size.height*3)
         SHolder.position.y = -ScreenSize.height*0.15
         ScoreHolder.addChild(SHolder)
+        
+        SSHolder = SKSpriteNode(imageNamed: "ShieldsHolder")
+        Scale(SSHolder, Height: ScoreHolder.size.height*1.5)
+        SSHolder.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        SSHolder.position.x = (ScreenSize.width/6)
+        ScoreHolder.addChild(SSHolder)
+        
     }
     
     func ShackCoins()

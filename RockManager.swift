@@ -39,7 +39,7 @@ class RockManager
         setAnchors([floating,rock], anchor: ZERO_ANCHOR)
         rock.position = CGPoint(x: random(ScreenSize.width*1.6, end: ScreenSize.width*1.85), y : Hero.HeroPositionOnScreen.y + random(minHeight, end: maxHeight))
         let enemy = EnemyGuy()
-        enemy.AddToTower(self.parent, position: CGPoint(x: rock.position.x + rock.size.width/2,
+        enemy.AddToRock(self.parent, position: CGPoint(x: rock.position.x + rock.size.width/2,
                          y: rock.position.y + rock.size.height + enemy.holder.size.height*0.5))
         enemies.append(enemy)
         rock.addChild(floating)
@@ -47,8 +47,8 @@ class RockManager
         
         rocks.append(rock)
         
-        let wait = SKAction.waitForDuration(TowerManager.LevelStepDelay)
-        let show = SKAction.moveByX(-ScreenSize.width, y: 0, duration: TowerManager.LevelStepDelay)
+        let wait = SKAction.waitForDuration(RockManager.LevelStepDelay)
+        let show = SKAction.moveByX(-ScreenSize.width, y: 0, duration: RockManager.LevelStepDelay)
         let action = SKAction.sequence([wait,show])
         rock.runAction(action)
         enemy.holder.runAction(action)
@@ -60,8 +60,8 @@ class RockManager
         canPlay = false
         createFirst()
 
-        let wait = SKAction.waitForDuration(TowerManager.LevelStepDelay)
-        let hide = SKAction.moveToX(-rocks[0].size.width, duration: TowerManager.LevelStepDelay)
+        let wait = SKAction.waitForDuration(RockManager.LevelStepDelay)
+        let hide = SKAction.moveToX(-rocks[0].size.width, duration: RockManager.LevelStepDelay)
         let action = SKAction.sequence([wait,hide])
         rocks[0].runAction(action, completion: {
             self.rocks[0].removeFromParent()
@@ -79,7 +79,7 @@ class RockManager
         
         if SoundState
         {
-            rocks.last!.runAction(SKAction.group([action,SKAction.playSoundFileNamed("wall_hited.mp3", waitForCompletion: false)]))
+            rocks.last!.runAction(SKAction.group([action,SKAction.playSoundFileNamed("\(getDefaultCharacter())[wall_hited].mp3", waitForCompletion: false)]))
         }
     }
     
@@ -100,6 +100,27 @@ class RockManager
             node.runAction(sequence)
         }
     }
+    
+    func fireParticles(position: CGPoint) {
+        for _ in 1...10
+        {
+            let node = SKSpriteNode(imageNamed: "BulletParticle")
+            ScaleWithWidth(node, width: rocks.last!.size.width/5)
+            node.position = position
+            node.runAction(SKAction.colorizeWithColor(UIColor.redColor(), colorBlendFactor: random(1, end: 5)/5, duration: 0.0))
+            let move = SKAction.moveBy(CGVector(dx: random(0, end: ScreenSize.width/10)-ScreenSize.width/20, dy: random(0.0, end: ScreenSize.height/10)-ScreenSize.height/20), duration: 0.2)
+            let moveUp = SKAction.moveBy(CGVector(dx: 0, dy: random(0.0, end: ScreenSize.height/5)), duration: 1)
+            //      let moveUp = SKAction.moveToY(random(0.0, end: ScreenSize.height)+ScreenSize.height/2, duration: 1)
+            let fireMove = SKAction.sequence([move,moveUp])
+            let scale = SKAction.scaleXTo(0, duration: NSTimeInterval(random(1, end: 5)/10))
+            let group = SKAction.group([fireMove, scale])
+            let remove = SKAction.removeFromParent()
+            let sequence = SKAction.sequence([group, remove])
+            parent.addChild(node)
+            node.runAction(sequence)
+        }
+    }
+
 }
 
 

@@ -1,17 +1,9 @@
 //
 //  PlatformManager.swift
-//  Canon Hero
+//  Take Them Down
 //
-//  Created by KHALID on 13/09/15.
-//  Copyright (c) 2015 KHALID. All rights reserved.
-//
-
-//
-//  Platform.swift
-//  Banana Kong
-//
-//  Created by KHALID on 05/03/15.
-//  Copyright (c) 2015 KHALID. All rights reserved.
+//  Created by Pisi on 11/13/15.
+//  Copyright © 2015 AznSoft. All rights reserved.
 //
 
 import SpriteKit
@@ -47,8 +39,8 @@ class PlatformManager
     
     func move()
     {
-        let wait = SKAction.waitForDuration(TowerManager.LevelStepDelay)
-        let move = SKAction.moveByX(-ScreenSize.width, y: 0, duration: TowerManager.LevelStepDelay)
+        let wait = SKAction.waitForDuration(RockManager.LevelStepDelay)
+        let move = SKAction.moveByX(-ScreenSize.width, y: 0, duration: RockManager.LevelStepDelay)
         let action = SKAction.sequence([wait,move])
         
         for p in platformArray
